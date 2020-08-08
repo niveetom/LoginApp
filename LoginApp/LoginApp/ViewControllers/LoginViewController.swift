@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  LoginViewController.swift
 //  LoginApp
 //
 //  Created by Nivedhitha Parthasarathy on 07/08/20.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class LoginViewController: UIViewController {
+class LoginViewController: UIViewController{
 
     @IBOutlet weak var imgProfile: UIImageView!
     @IBOutlet weak var txtEmailID: UITextField!
@@ -44,9 +44,8 @@ class LoginViewController: UIViewController {
     
     func isValidPswd(_ pswd:String) -> Bool {
         
-        let pswdRegEx = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,}$"
-        let pswdTest = NSPredicate(format:"SELF MATCHES[c] %@", pswdRegEx)
-        return pswdTest.evaluate(with: pswd)
+        let passwordTest = NSPredicate(format: "SELF MATCHES %@", "^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8}$")
+        return passwordTest.evaluate(with: pswd)
     }
 
     @IBAction func click_Login(_ sender: Any) {
@@ -61,7 +60,7 @@ class LoginViewController: UIViewController {
             self.present(alert, animated: true, completion: nil)
         }
         if lPswd.isEmpty, !(lEmail.isEmpty) {
-            let alert = UIAlertController(title: "Password cannot be blank", message: "", preferredStyle: UIAlertController.Style.alert)
+            let alert = UIAlertController(title: "Password cannot be blank", message: "Password must be eight characters long with atleast one upper case letter, one lower case letter, one number and one special character.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
         }
@@ -81,11 +80,31 @@ class LoginViewController: UIViewController {
         }
         guard validPswd == true else
         {
-            txtPassword.text = nil
-            let alert = UIAlertController(title: "Password must minimum 8 characters long and must contain atleast 1 alphabet, 1 number and 1 special character", message: "", preferredStyle: UIAlertController.Style.alert)
-            alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-            return
+            var errorMsg = "Password requires at least "
+            if let txt = txtPassword.text
+            {
+                if (txt.rangeOfCharacter(from: CharacterSet.uppercaseLetters) == nil) {
+                    errorMsg += ", one upper case letter"
+                }
+                if (txt.rangeOfCharacter(from: CharacterSet.lowercaseLetters) == nil) {
+                    errorMsg += ", one lower case letter"
+                }
+                if (txt.rangeOfCharacter(from: CharacterSet.decimalDigits) == nil) {
+                    errorMsg += ", one number"
+                }
+                if (txt.rangeOfCharacter(from: CharacterSet(charactersIn: "!~`@#$%^&*-+();:={}[],.<>?\\/\"\'")) == nil) {
+                    errorMsg += ", one special character"
+                }
+                if txt.count < 8 {
+                    errorMsg += ", eight characters long"
+                }
+                txtPassword.text = nil
+                let alert = UIAlertController(title: errorMsg, message: "", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+                
+            }
+        return
         }
         let mainViewController = UIStoryboard(name:"Main",bundle:nil).instantiateViewController(withIdentifier: "TableVC") as! TableViewController
         let nvc: UINavigationController = UINavigationController(rootViewController: mainViewController)
@@ -166,7 +185,6 @@ extension LoginViewController: UIImagePickerControllerDelegate, UINavigationCont
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
-    
 }
 
 extension UIImageView {
