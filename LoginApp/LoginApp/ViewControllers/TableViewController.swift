@@ -9,7 +9,7 @@
 import UIKit
 
 var sectionArr = ["Section 0", "Section 1", "Section 2", "Section 3", "Section 4"]
-var rowDict = [2,0,1,0,3]
+var rowDict = [0,0,0,0,0]
 
 protocol TableViewHeaderDelegate : class {
     func didChangeHeaderSwitchState(_ sender: CustomHeader, isOn: Bool)
@@ -78,6 +78,10 @@ class TableViewController: UIViewController, UITableViewDelegate, UITableViewDat
         header.btnSwitchSelector.tag = section
         header.tag = section
         header.lblSection.text =  sectionArr[section]
+        header.btnSwitchSelector.isHidden = false
+        if rowDict[section] == 0{
+            header.btnSwitchSelector.isHidden = true
+        }
         header.lblSection.textColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
         header.headerDelegate = self
         return header
@@ -124,7 +128,7 @@ class TableViewController: UIViewController, UITableViewDelegate, UITableViewDat
         else{
             self.selectedRows[sender.tag].removeAll()
             sender.btnSwitchSelector.setOn(false, animated: true)
-            self.tableView.reloadData()
+            self.tableView.reloadSections(IndexSet(integer: sender.tag), with: .none)
         }
     }
     
